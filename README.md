@@ -1,2 +1,32 @@
 # java-explore-with-me
-Template repository for ExploreWithMe project.
+Приложение-афиша, позволяющее пользователям делиться информацией о интересных событиях и находить компанию для участия в них.
+
+*Основной сервис:*
+- Создание и просмотр событий
+- Присоединение к событиям
+- Комментирование и общение с другими участниками
+### Спецификация REST API
+[Спецификация основного сервиса.](ewm-main-service-spec.json)
+
+
+*Сервис статистики:*
+- Хранение количества просмотров
+- Возможность анализировать работу приложения через выборки данных
+### Спецификация REST API
+[Спецификация сервиса статистики.](ewm-stats-service-spec.json)
+
+## Запуск приложения
+Потребуется Java 11, Docker, Git, Apache Maven
+
+1. Склонировать
+```bash
+git clone https://github.com/AlinaProvotorova/java-explore-with-me.git
+```
+2. Собрать проект
+```bash
+mvn clean package
+```
+3. Запустить через Docker Compose
+```bash
+docker compose up
+```
