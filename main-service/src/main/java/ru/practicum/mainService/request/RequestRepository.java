@@ -28,7 +28,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
             "r.status = 'CONFIRMED'")
     Long getConfirmedRequests(Long eventId);
 
-    @Query("SELECT new ru.practicum.main.event.model.EventConfirmedRequests(r.event.id, count(r.id)) " +
+    @Query("SELECT new ru.practicum.mainService.event.model.EventConfirmedRequests(r.event.id, count(r.id)) " +
             "FROM Request r " +
             "WHERE r.event.id IN ?1 " +
             "AND r.status = 'CONFIRMED' " +

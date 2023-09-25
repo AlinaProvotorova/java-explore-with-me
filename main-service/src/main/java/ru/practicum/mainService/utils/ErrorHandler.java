@@ -1,12 +1,15 @@
 package ru.practicum.mainService.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.mainService.exceptions.CantDoException;
 import ru.practicum.mainService.exceptions.ErrorMessage;
 import ru.practicum.mainService.exceptions.NotFoundException;
 
@@ -24,7 +27,20 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({
-            IllegalArgumentException.class
+            DataIntegrityViolationException.class,
+            CantDoException.class,
+            HttpMessageNotReadableException.class
+    })
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorMessage dataIntegrityViolationException(final RuntimeException e) {
+        log.error("Conflict: {}", e.getMessage(), e);
+        return new ErrorMessage(e.getMessage());
+    }
+
+
+    @ExceptionHandler({
+            IllegalArgumentException.class,
+            IllegalStateException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleBadRequestException(final RuntimeException e) {
