@@ -7,13 +7,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.mainService.event.model.Event;
+import ru.practicum.mainService.event.model.EventConfirmedRequests;
 import ru.practicum.mainService.request.RequestRepository;
 import ru.practicum.stats.StatClient;
 import ru.practicum.stats.dto.EndpointHitDto;
 import ru.practicum.stats.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,13 +50,9 @@ public class StatServiceImpl implements StatService {
     public Map<Long, Long> getViews(List<Event> events) {
         Map<Long, Long> views = new HashMap<>();
 
-        List<Event> publishedEvents = new ArrayList<>();
-
-        for (Event event : events) {
-            if (event.getPublishedOn() != null) {
-                publishedEvents.add(event);
-            }
-        }
+        List<Event> publishedEvents = events.stream()
+                .filter(event -> event.getPublishedOn() != null)
+                .collect(Collectors.toList());
 
         Optional<LocalDateTime> minPublished = publishedEvents.stream()
                 .map(Event::getPublishedOn)
@@ -82,20 +78,22 @@ public class StatServiceImpl implements StatService {
     @Override
     @Transactional(readOnly = true)
     public Map<Long, Long> getConfirmedRequests(List<Event> events) {
-        List<Long> publishedIds = new ArrayList<>();
+        List<Long> publishedIds = events.stream()
+                .filter(event -> event.getPublishedOn() != null)
+                .map(Event::getId)
+                .collect(Collectors.toList());
 
-        for (Event event : events) {
-            if (event.getPublishedOn() != null) {
-                publishedIds.add(event.getId());
-            }
-        }
 
         Map<Long, Long> confirmedRequests = new HashMap<>();
 
-        requestRepository.getConfirmedRequests(publishedIds)
-                .forEach(cr -> confirmedRequests.put(cr.getEventId(), cr.getConfirmed()));
+        return requestRepository.getConfirmedRequests(publishedIds).stream()
+                .collect(Collectors.toMap(
+                                EventConfirmedRequests::getEventId,
+                                EventConfirmedRequests::getConfirmed
+                        )
+                );
 
-        return confirmedRequests;
+
     }
 
 }

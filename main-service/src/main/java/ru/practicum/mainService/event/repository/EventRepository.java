@@ -10,6 +10,7 @@ import ru.practicum.mainService.event.model.Event;
 import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long>, CustomEventRepository {
@@ -31,7 +32,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, CustomEvent
             "e.id = ?1")
     Optional<Event> getEventIfPublished(Long eventId);
 
-    List<Event> findEventsByIdIn(List<Long> ids);
+    Set<Event> findEventsByIdIn(List<Long> ids);
 
     List<Event> findEventsByCategoryId(Long catId);
 

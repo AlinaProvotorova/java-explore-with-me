@@ -15,11 +15,11 @@ import ru.practicum.mainService.exceptions.CantDoException;
 import ru.practicum.mainService.exceptions.NotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -53,7 +53,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public CategoryDto getById(Long catId) {
         CategoryDto categoryDto = categoryMapper.toCategoryDto(checkIfCategoryExistsAndGet(catId));
         log.info("Категория с ID {} получена", catId);
@@ -61,7 +60,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CategoryDto> getAll(Integer from, Integer size) {
         log.info("Получен список всех категорий с параметрами from={}, size={}", from, size);
         return categoryMapper.toCategoryDto(categoryRepository.findAll(PageRequest.of(from / size, size)).toList());
@@ -74,12 +72,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private Category checkIfCategoryExistsAndGet(Long catId) {
-        Optional<Category> category = categoryRepository.findById(catId);
-        if (category.isPresent()) {
-            return category.get();
-        } else {
-            throw new NotFoundException(Category.class, catId);
-        }
+        return categoryRepository.findById(catId).orElseThrow(
+                () -> new NotFoundException(Category.class, catId)
+        );
     }
 
     private void checkIfCategoryExists(Long catId) {

@@ -19,10 +19,10 @@ import ru.practicum.mainService.event.service.StatService;
 import ru.practicum.mainService.exceptions.NotFoundException;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,7 +41,7 @@ public class CompilationServiceImpl implements CompilationService {
         if (compilationRequestDto.getPinned() == null) {
             compilationRequestDto.setPinned(false);
         }
-        Set<Event> events = eventsListToSet(eventRepository.findEventsByIdIn(compilationRequestDto.getEvents()));
+        Set<Event> events = eventRepository.findEventsByIdIn(compilationRequestDto.getEvents());
 
         allEventsExist(events.size(), compilationRequestDto.getEvents().size());
         Compilation compilation = compilationRepository.save(
@@ -59,7 +59,7 @@ public class CompilationServiceImpl implements CompilationService {
             compilation.setPinned(compilationRequestDto.getPinned());
         }
         if (compilationRequestDto.getEvents() != null) {
-            Set<Event> events = eventsListToSet(eventRepository.findEventsByIdIn(compilationRequestDto.getEvents()));
+            Set<Event> events = eventRepository.findEventsByIdIn(compilationRequestDto.getEvents());
             allEventsExist(events.size(), compilationRequestDto.getEvents().size());
             compilation.setEvents(events);
         }
@@ -115,15 +115,12 @@ public class CompilationServiceImpl implements CompilationService {
         Map<Long, Long> confirmedRequests = statService.getConfirmedRequests(new ArrayList<>(events));
 
         List<EventShortDto> result = new ArrayList<>();
-        for (Event event : events) {
-            result.add(eventMapper.toEventShortDto(event, confirmedRequests.getOrDefault(event.getId(), 0L),
-                    views.getOrDefault(event.getId(), 0L)));
-        }
-        return result;
-    }
-
-    private Set<Event> eventsListToSet(List<Event> events) {
-        return new HashSet<>(events);
+        return events.stream()
+                .map(event -> eventMapper
+                        .toEventShortDto(event,
+                                confirmedRequests.getOrDefault(event.getId(), 0L),
+                                views.getOrDefault(event.getId(), 0L)))
+                .collect(Collectors.toList());
     }
 
     private void compExists(Long compId) {
