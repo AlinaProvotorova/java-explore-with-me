@@ -114,7 +114,6 @@ public class CompilationServiceImpl implements CompilationService {
         Map<Long, Long> views = statService.getViews(new ArrayList<>(events));
         Map<Long, Long> confirmedRequests = statService.getConfirmedRequests(new ArrayList<>(events));
 
-        List<EventShortDto> result = new ArrayList<>();
         return events.stream()
                 .map(event -> eventMapper
                         .toEventShortDto(event,
