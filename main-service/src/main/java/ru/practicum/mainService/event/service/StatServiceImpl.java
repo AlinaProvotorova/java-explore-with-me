@@ -82,7 +82,6 @@ public class StatServiceImpl implements StatService {
                 .filter(event -> event.getPublishedOn() != null)
                 .map(Event::getId)
                 .collect(Collectors.toList());
-        
 
         return requestRepository.getConfirmedRequests(publishedIds).stream()
                 .collect(Collectors.toMap(
