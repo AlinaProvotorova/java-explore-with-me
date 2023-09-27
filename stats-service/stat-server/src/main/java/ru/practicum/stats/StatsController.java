@@ -18,6 +18,8 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.practicum.stats.utils.Constants.DATE_PATTERN;
+
 @RestController
 @Validated
 @Slf4j
@@ -34,8 +36,8 @@ public class StatsController {
 
     @GetMapping("/stats")
     public ResponseEntity<List<ViewStatsDto>> getAllStats(
-            @RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-            @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+            @RequestParam("start") @DateTimeFormat(pattern = DATE_PATTERN) LocalDateTime start,
+            @RequestParam("end") @DateTimeFormat(pattern = DATE_PATTERN) LocalDateTime end,
             @RequestParam(value = "uris", required = false) List<String> uris,
             @RequestParam(value = "unique", defaultValue = "false", required = false) boolean unique) {
         log.info("Получен GET запрос по эндпоинту /stats на получение статистики по посещениям.");
